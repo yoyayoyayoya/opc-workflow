@@ -14,7 +14,7 @@ description: Sprint 规划工作流 — 与 CEO 讨论需求、制定下一批 S
 /plan_sprint (本 workflow) → /sprint (开发) → /audit (审计)
 ```
 
-**核心职责**: 读取产品文档 + 历史决策上下文，与 CEO 讨论并制定下一批 Sprint 计划，最终将结论写入 `docs_v2/sprint_tracker.md` 和 `docs_v2/design_decisions.md`，确保后续会话能无缝接力。
+**核心职责**: 读取产品文档 + 历史决策上下文，与 CEO 讨论并制定下一批 Sprint 计划，最终将结论写入 `docs/sprint_tracker.md` 和 `docs/design_decisions.md`，确保后续会话能无缝接力。
 
 ---
 
@@ -35,11 +35,11 @@ description: Sprint 规划工作流 — 与 CEO 讨论需求、制定下一批 S
 按顺序读取以下文件：
 
 ```
-1. docs_v2/sprint_tracker.md       → 当前以完成到哪个 Sprint，以及已规划的未来 Sprint
-2. docs_v2/design_decisions.md     → 历史架构/产品决策，避免重复讨论已定事项
-3. docs_v2/product_vision.md       → 产品方向和差异化壁垒，规划时对齐
-4. docs_v2/architecture.md         → 技术架构设计，确认规划的可行性
-5. docs_v2/sprints/audit-sprint-{最新N}.md  → 最近一次审计报告，了解遗留问题
+1. docs/sprint_tracker.md       → 当前以完成到哪个 Sprint，以及已规划的未来 Sprint
+2. docs/design_decisions.md     → 历史架构/产品决策，避免重复讨论已定事项
+3. docs/product_vision.md       → 产品方向和差异化壁垒，规划时对齐
+4. docs/architecture.md         → 技术架构设计，确认规划的可行性
+5. docs/sprints/audit-sprint-{最新N}.md  → 最近一次审计报告，了解遗留问题
 ```
 
 读完后向用户汇报现状摘要：
@@ -54,7 +54,7 @@ description: Sprint 规划工作流 — 与 CEO 讨论需求、制定下一批 S
 
 ## Step 2: 现状差距分析
 
-对照 `docs_v2/product_vision.md` 的里程碑和 `docs_v2/architecture.md` 的模块清单：
+对照 `docs/product_vision.md` 的里程碑和 `docs/architecture.md` 的模块清单：
 
 1. **列出已实现的核心能力**（从 sprint_tracker.md 中已完成的 Sprint 归纳）
 2. **列出尚未实现的关键能力**（按优先级排序）
@@ -143,7 +143,7 @@ CEO 做出决策后：
 
 // turbo
 
-对本次规划讨论中产生的**每一个新的架构/产品决策**，按以下格式追加到 `docs_v2/design_decisions.md`：
+对本次规划讨论中产生的**每一个新的架构/产品决策**，按以下格式追加到 `docs/design_decisions.md`：
 
 ```markdown
 ### D{下一个编号}: {决策标题}

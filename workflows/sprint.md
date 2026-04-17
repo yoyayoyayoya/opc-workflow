@@ -16,15 +16,16 @@ description: Sprint 开发工作流 — 小步可控的迭代开发，每个 Spr
 6. **主动研究先于编码**：写代码前必须先研究框架/库的能力边界（读文档、查源码），在 Step 1.8 中产出 `sprint-{N}-capability-map.md` 文件。**此文件是进入 Step 2 的唯一通行证——文件不存在，不得执行任何 Task**。禁止跳过研究直接编码——AI 天生倾向"凑合自己写"，必须用 workflow 强制先研究再动手。
 7. **功能完整由于测试**：写测试的目的是为了检验功能设计的完整性，禁止为了通过测试，产生奇怪的代码异味。
 8. **深究测试失败根本原因**：禁止为了测试通过，不经过研究和分析根本原因就去盲目的修改测试用例。
-9. **审计报告只读**：`docs_v2/sprints/audit-sprint-{N}.md` 由独立审计会话产出，sprint workflow 下**严禁修改**。对审计报告有异议或补充说明，必须写入 `docs_v2/sprints/sprint-{N+1}-review.md` 的「审计异议/说明」章节，不得直接编辑审计报告。
+9. **审计报告只读**：`docs/sprints/audit-sprint-{N}.md` 由独立审计会话产出，sprint workflow 下**严禁修改**。对审计报告有异议或补充说明，必须写入 `docs/sprints/sprint-{N+1}-review.md` 的「审计异议/说明」章节，不得直接编辑审计报告。
 
 ---
 
 > [!IMPORTANT]
-> **🐍 虚拟环境强制要求（每一条 Python/pytest 命令都必须遵守）**
-> 所有 Python 相关终端命令必须使用项目 venv，绝对禁止使用系统 Python 或 `uv run`。
-> **唯一合法命令格式**：`.venv/bin/python -m pytest tests/ -q --timeout=30`
-> 违反此规则 = 命令必然报错，审计流程中断。
+> **⚙️ 测试命令配置（每个项目在 `docs/sprint_tracker.md` 中定义一次）**
+> 在你的项目文档中声明：
+> - `{test_command}`：运行全量测试套件的命令（如 `pytest tests/`、`npm test`、`cargo test` 等）
+> - `{lint_command}`：运行代码检查的命令（如 `ruff check src/`、`eslint src/`、`clippy` 等）
+> 本 workflow 中所有测试步骤均使用这两个占位符，执行时替换为你项目实际命令。
 
 ---
 
@@ -35,11 +36,11 @@ description: Sprint 开发工作流 — 小步可控的迭代开发，每个 Spr
 读取以下文件获取当前进度（**任意文件不存在时，必须向用户明确告警并暂停，不得静默跳过**）：
 
 ```
-1. docs_v2/sprint_tracker.md               → 定位当前 Sprint 编号、目标和 Task 列表
-2. docs_v2/design_decisions.md             → 历史架构/产品决策，确保实现符合已确认方案
-3. docs_v2/sprints/sprint-{N}-review.md   → 上一轮 Sprint 的自我回顾（注意：N 是上一个 Sprint 编号）
+1. docs/sprint_tracker.md               → 定位当前 Sprint 编号、目标和 Task 列表
+2. docs/design_decisions.md             → 历史架构/产品决策，确保实现符合已确认方案
+3. docs/sprints/sprint-{N}-review.md   → 上一轮 Sprint 的自我回顾（注意：N 是上一个 Sprint 编号）
    ⚠️ 若不存在：告警「sprint-{N}-review.md 缺失，上一 Sprint 未生成回顾文档」
-4. docs_v2/sprints/audit-sprint-{N}.md    → 【必读】上一 Sprint 的独立审计报告（N 是上一个编号）
+4. docs/sprints/audit-sprint-{N}.md    → 【必读】上一 Sprint 的独立审计报告（N 是上一个编号）
    ⚠️ 若不存在：告警「audit-sprint-{N}.md 缺失，本 Sprint 跳过修复清单阶段」
    ✅ 若存在：必须完整阅读整个文件，枚举所有「修复清单」条目，不得只读部分
    🚫 只读文档：审计报告由独立审计会话产出，sprint workflow 下禁止写入或修改
@@ -74,7 +75,7 @@ description: Sprint 开发工作流 — 小步可控的迭代开发，每个 Spr
 
 > 🔬 **核心纪律 #6 强制执行点**：写任何代码前必须先研究整个 Sprint 的框架能力边界，禁止直接进入实现。
 
-在进入逐 Task 循环之前，必须先整体研究并产出 `docs_v2/sprints/sprint-{N}-capability-map.md`。
+在进入逐 Task 循环之前，必须先整体研究并产出 `docs/sprints/sprint-{N}-capability-map.md`。
 
 **研究步骤：**
 
@@ -83,7 +84,7 @@ description: Sprint 开发工作流 — 小步可控的迭代开发，每个 Spr
    - 读官方文档或 CHANGELOG（记录版本和关键 API）
    - 查源码（记录关键类/函数签名）
    - 查项目中已有使用先例（记录文件路径）
-3. **创建 `docs_v2/sprints/sprint-{N}-capability-map.md`**，结构要求见下方模板
+3. **创建 `docs/sprints/sprint-{N}-capability-map.md`**，结构要求见下方模板
 
 ### 文档模板
 
@@ -166,7 +167,7 @@ description: Sprint 开发工作流 — 小步可控的迭代开发，每个 Spr
 > [!CAUTION]
 > **🚦 能力映射文件门禁（强制，每次进入 Step 2 前必须执行）**
 > 
-> 在执行任何 Task 之前，必须先验证 `docs_v2/sprints/sprint-{N}-capability-map.md` 已存在且有实质内容（非空文件）。
+> 在执行任何 Task 之前，必须先验证 `docs/sprints/sprint-{N}-capability-map.md` 已存在且有实质内容（非空文件）。
 > 
 > - ✅ 文件存在 → 继续执行 2.1
 > - ❌ 文件不存在 → **立即停止，返回 Step 1.8 完成研究，生成文件后才能继续**
@@ -182,14 +183,14 @@ description: Sprint 开发工作流 — 小步可控的迭代开发，每个 Spr
 运行现有测试套件确认基线是绿的：
 
 ```bash
-.venv/bin/python -m pytest tests/ -q --timeout=30
+{test_command}
 ```
 
 如果基线不绿，必须先修复，不能在红色基线上写新代码。
 
 ### 2.2 展示 Task 方案
 
-打开 `docs_v2/sprints/sprint-{N}-capability-map.md`，找到当前 Task 对应的章节，基于其中**已验证的 API 签名和设计决策**，向用户展示：
+打开 `docs/sprints/sprint-{N}-capability-map.md`，找到当前 Task 对应的章节，基于其中**已验证的 API 签名和设计决策**，向用户展示：
 
 - 要改哪些文件（必须在 capability-map 的「变更最小化清单」中已列出）
 - 怎么改（使用 capability-map 中记录的 API，不得使用未经研究验证的 API）
@@ -212,8 +213,8 @@ description: Sprint 开发工作流 — 小步可控的迭代开发，每个 Spr
 // turbo
 
 ```bash
-.venv/bin/python -m pytest tests/ -q --timeout=30
-.venv/bin/python -m ruff check src/
+{test_command}
+{lint_command}
 ```
 
 向用户展示测试结果。**暂停，等用户确认本 Task 通过。**
@@ -232,7 +233,7 @@ description: Sprint 开发工作流 — 小步可控的迭代开发，每个 Spr
 
 > **职责说明**：sprint-{N}-review.md 由 **Sprint N 的 sprint workflow（本步骤）** 负责生成，不由审计会话生成。
 
-所有 Task 完成后，生成 Sprint 回顾文档。写入 `docs_v2/sprints/sprint-{N}-review.md`：
+所有 Task 完成后，生成 Sprint 回顾文档。写入 `docs/sprints/sprint-{N}-review.md`：
 
 > **时序说明**：
 >
@@ -268,8 +269,8 @@ description: Sprint 开发工作流 — 小步可控的迭代开发，每个 Spr
 
 ## 验证结果
 
-pytest: {通过}/{总数} pass
-ruff: {错误数} errors
+测试（{test_command}）: {通过}/{总数} pass
+Lint（{lint_command}）: {错误数} errors
 
 ## 遗留问题
 
@@ -280,9 +281,9 @@ ruff: {错误数} errors
 - {如有}
 ```
 
-更新 `docs_v2/sprint_tracker.md` 标记当前 Sprint 为完成。
+更新 `docs/sprint_tracker.md` 标记当前 Sprint 为完成。
 更新 `docs/changes.md` 记录本 Sprint 的变更。
-确认 `docs_v2/sprints/sprint-{N}-capability-map.md` 已包含本 Sprint 所有 Task 的研究结论。
+确认 `docs/sprints/sprint-{N}-capability-map.md` 已包含本 Sprint 所有 Task 的研究结论。
 
 ---
 
