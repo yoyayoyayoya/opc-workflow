@@ -1,87 +1,87 @@
-# 贡献指南
+# Contributing Guide
 
-感谢你对 OPC Workflow 的兴趣！
-
----
-
-## 贡献类型
-
-### 1. 🔧 工具适配（Tool Adapters）
-
-**目标**：针对特定 AI 工具优化 workflow 行为。
-
-不同工具有不同的指令格式和上下文机制：
-
-| 工具 | 现状 | 适配方向 |
-|------|------|---------|
-| Claude Code | ✅ 已验证 | slash commands + CLAUDE.md |
-| Cursor | 部分验证 | `.cursorrules` 集成 |
-| Kiro | 部分验证 | Steering 文件集成 |
-| Gemini (Antigravity) | ✅ 已验证 | user_rules 集成 |
-| GitHub Copilot Chat | 未验证 | / |
-
-**提交方式**：
-1. 在 `workflows/adapters/{tool-name}/` 下创建适配文档
-2. 说明适配方式和已验证的场景（说明你在什么真实项目中验证，可以不透露项目名称）
-3. 提供 PR
+Thanks for your interest in OPC Workflow!
 
 ---
 
-### 2. 📦 技术栈模板（Stack Templates）
+## Types of Contributions
 
-**目标**：为不同技术栈提供专属 Sprint 模板，减少用户配置负担。
+### 1. 🔧 Tool Adapters
 
-模板位置：`workflows/templates/{stack-name}/`
+**Goal**: Optimize workflow behavior for specific AI tools.
 
-**已知需求**（来自社区反馈）：
+Different tools have different command formats and context mechanisms:
 
-- Python / FastAPI 后端
-- React / Next.js 前端
-- React Native 移动端
-- Rust CLI 工具
+| Tool | Status | Adapter direction |
+|------|--------|------------------|
+| Claude Code | ✅ Verified | slash commands + CLAUDE.md |
+| Cursor | Partially verified | `.cursorrules` integration |
+| Kiro | Partially verified | Steering file integration |
+| Antigravity (Google Deepmind) | ✅ Verified | `.agents/workflows/` + slash commands |
+| GitHub Copilot Chat | Not verified | — |
+
+**How to submit**:
+1. Create an adapter doc under `workflows/adapters/{tool-name}/`
+2. Describe the adapter approach and the scenarios you verified (no need to name your project)
+3. Submit a PR
+
+---
+
+### 2. 📦 Stack Templates
+
+**Goal**: Provide ready-made Sprint templates for different tech stacks, reducing user setup.
+
+Template location: `workflows/templates/{stack-name}/`
+
+**Known demand** (from community feedback):
+
+- Python / FastAPI backend
+- React / Next.js frontend
+- React Native mobile
+- Rust CLI tools
 - Go microservices
 
-**模板内容**：
-- `sprint.md` 变体（针对技术栈的测试命令、lint 工具等）
-- `audit.md` 变体（针对技术栈的变异测试策略）
-- `docs/` 目录模板（`sprint_tracker.md` + `design_decisions.md` 初始版本）
+**Template contents**:
+- `sprint.md` variant (stack-specific test commands, lint tools, etc.)
+- `audit.md` variant (stack-specific mutation testing strategies)
+- `docs/` directory template (`sprint_tracker.md` + `design_decisions.md` starters)
 
 ---
 
-### 3. 📖 案例分享（Case Studies）
+### 3. 📖 Case Studies
 
-**目标**：积累真实的使用数据，构建方法论的可信度。
+**Goal**: Accumulate real usage data to build credibility for the methodology.
 
-**提交方式**：
-1. 发一个 issue，标题格式：`[Case Study] 你的项目名`
-2. 内容包含：
-   - 技术栈
-   - 已完成的 Sprint 数量
-   - 累计测试数量
-   - 用 OPC Workflow 发现的有意义的 Bug（如有）
-   - 项目链接（可选，可以匿名）
-
----
-
-## 提交流程
-
-1. Fork 本仓库
-2. 创建特性分支：`git checkout -b feat/cursor-adapter`
-3. 提交改动（遵循 [Conventional Commits](https://www.conventionalcommits.org/)）
-4. 发起 PR，描述你的改动和验证方式
+**How to submit**:
+1. Open an issue with the title: `[Case Study] Your project name (or "Anonymous")`
+2. Include:
+   - Tech stack
+   - Number of Sprints completed using OPC Workflow
+   - Total test count
+   - Any meaningful bugs found by `/audit` (if any)
+   - Project link (optional, anonymous is fine)
 
 ---
 
-## 质量标准
+## Submission Process
 
-提交的 workflow 变体或模板必须满足：
-
-- [ ] 已在真实项目中验证（不是纸上谈兵）
-- [ ] 核心三条纪律不得削弱：**独立审计**、**研究先于编码**、**零假测试容忍**
-- [ ] 有具体的使用说明和示例
+1. Fork this repository
+2. Create a feature branch: `git checkout -b feat/cursor-adapter`
+3. Commit your changes (follow [Conventional Commits](https://www.conventionalcommits.org/))
+4. Open a PR describing your changes and how you verified them
 
 ---
 
-## 版权
+## Quality Standards
 
-贡献的内容遵循本仓库的 MIT 协议。
+Submitted workflow variants or templates must satisfy:
+
+- [ ] Verified in a real project (not theoretical)
+- [ ] The three core disciplines must not be weakened: **independent audit**, **research before coding**, **zero fake-test tolerance**
+- [ ] Includes clear usage instructions and examples
+
+---
+
+## License
+
+Contributions follow the MIT license of this repository.

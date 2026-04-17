@@ -1,37 +1,37 @@
-# 活体案例
+# Live Case Study
 
-> 作者正在用 OPC Workflow 开发一个本地 AI 工程项目，以下是真实数据，持续更新。
+> The author is using OPC Workflow to develop a local AI engineering project. Real-world data below, updated continuously.
 
-## 实战数据
+## Real-World Data
 
-| 指标 | 数据 | 最后更新 |
-|------|------|---------|
-| 已完成 Sprint | 7 | 2026-04-17 |
-| 累计测试 | 459 | 2026-04-17 |
-| 变异测试捕获率 | 100%（6/6）| 2026-04-17 |
-| 审计发现致命 Bug | 1 | Sprint 3 |
-| 假测试被清除 | 27 | 累计 |
+| Metric | Data | Last updated |
+|--------|------|-------------|
+| Sprints completed | 7 | 2026-04-17 |
+| Total tests | 459 | 2026-04-17 |
+| Mutation test capture rate | 100% (6/6) | 2026-04-17 |
+| Critical bugs found by audit | 1 | Sprint 3 |
+| Fake tests found & fixed | 27 | cumulative |
 
-## 关键发现
+## Key Finding
 
-### Sprint 3 审计：安全边界绕过 Bug
+### Sprint 3 Audit: Security Boundary Bypass
 
-**现象**：某执行模块直接实例化组件，绕过了注册中心。
+**What happened**: An execution module directly instantiated components, bypassing the registry.
 
-**影响**：安全边界、工具注入、内存系统全部失效。
+**Impact**: Security boundaries, tool injection, and the memory system all failed silently.
 
-**被发现方式**：独立 `/audit` 会话，变异测试捕获。
+**How it was found**: Independent `/audit` session — caught by mutation testing.
 
-**为什么开发者自己没发现**：开发者在 Sprint 会话中写了代码也写了测试，确认偏差导致盲区。独立审计会话消除了这个偏差。
+**Why the developer didn't catch it**: The developer wrote both the code and the tests in the same Sprint session. Confirmation bias creates blind spots. An isolated audit session eliminates that bias.
 
-## Sprint 历史
+## Sprint History
 
-| Sprint | 目标 | 测试数 | 审计状态 |
-|--------|------|--------|---------|
-| Sprint 1 | Agent 基础框架 | 45 | ✅ 通过 |
-| Sprint 2 | 任务调度系统 | 78 | ✅ 通过 |
-| Sprint 3 | Harness 系统 | 112 | ✅ 通过（发现 1 致命 Bug）|
-| Sprint 4 | 记忆系统 | 89 | ✅ 通过 |
-| Sprint 5 | 工具注入 | 67 | ✅ 通过 |
-| Sprint 6 | 星级系统 | 34 | ✅ 通过 |
-| Sprint 7 | TUI + MCP | 34 | ✅ 通过 |
+| Sprint   | Goal                  | Tests | Audit status |
+|----------|-----------------------|-------|--------------|
+| Sprint 1 | Agent base framework  | 45    | ✅ Passed    |
+| Sprint 2 | Task scheduling       | 78    | ✅ Passed    |
+| Sprint 3 | Harness system        | 112   | ✅ Passed (1 critical bug found) |
+| Sprint 4 | Memory system         | 89    | ✅ Passed    |
+| Sprint 5 | Tool injection        | 67    | ✅ Passed    |
+| Sprint 6 | Star rating system    | 34    | ✅ Passed    |
+| Sprint 7 | TUI + MCP             | 34    | ✅ Passed    |

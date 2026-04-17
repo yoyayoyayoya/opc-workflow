@@ -1,55 +1,55 @@
-# Sprint Tracker 模板
+# Sprint Tracker Template
 
-> **使用方法**：将此文件复制到你项目的 `docs/sprint_tracker.md`，按实际情况填写
-
----
-
-## 当前状态
-
-**项目**: {项目名称}
-**阶段**: Sprint {N}
+> **Usage**: Copy this file to `docs/sprint_tracker.md` in your project and fill in accordingly.
 
 ---
 
-## 完整 Sprint 生命周期
+## Current Status
+
+**Project**: {project name}
+**Phase**: Sprint {N}
+
+---
+
+## Full Sprint Lifecycle
 
 ```
-/plan_sprint (会话 A) → 讨论 + 制定计划 → 写入 sprint_tracker.md
-  ↓ 关闭会话
-/sprint (会话 B) → 开发 Sprint N
-  ↓ 关闭会话
-/audit (会话 C) → 审核 Sprint N → 生成 audit-sprint-N.md
-  ↓ 关闭会话
-CEO 验收 → 通过/打回
+/plan_sprint (Session A) → discuss + plan → write to sprint_tracker.md
+  ↓ close session
+/sprint (Session B) → develop Sprint N
+  ↓ close session
+/audit (Session C) → audit Sprint N → produce audit-sprint-N.md
+  ↓ close session
+Owner review → Pass / Send back
 ```
 
 ---
 
-## Sprint 记录
+## Sprint Log
 
-### Sprint 1: {Sprint 名称}
+### Sprint 1: {Sprint name}
 
-**目标**: {一句话目标}
+**Goal**: {one-sentence goal}
 
-**架构依赖**: 无依赖 / Sprint N 完成后启动
+**Depends on**: No dependencies / Sprint N must complete first
 
-**关键设计决策**: {本次规划确认的关键决策摘要}
+**Key design decisions**: {summary of key decisions confirmed in this planning session}
 
-| Task | 描述 | 文件 | 状态 |
-|------|------|------|------|
-| T01 | {做什么 + 在哪个文件 + 关键实现方式} | `src/...` | ⬜ |
-| T02 | ... | `src/...` | ⬜ |
+| Task | Description | File | Status |
+|------|-------------|------|--------|
+| T01  | {what + which file + key implementation approach} | `src/...` | ⬜ |
+| T02  | ... | `src/...` | ⬜ |
 
-**验收标准**:
-- {可被 /audit 量化检查的具体条件}
-- {例如：X 在 DB 持久化 / 测试用例覆盖 Y 场景}
+**Acceptance criteria**:
+- {specific, quantifiable condition checkable by /audit}
+- {e.g.: X persisted in DB / tests cover Y scenario / API returns Z format}
 
-**状态**: ⬜ 未开始 / 🚧 进行中 / ✅ 完成
+**Status**: ⬜ Not started / 🚧 In progress / ✅ Complete
 
 ---
 
-## Sprint 统计
+## Sprint Statistics
 
-| Sprint | 测试数 | 通过率 | 审计结果 | 完成日期 |
-|--------|--------|--------|---------|---------|
-| Sprint 1 | - | - | - | - |
+| Sprint   | Tests | Pass rate | Audit result | Completed   |
+|----------|-------|-----------|--------------|-------------|
+| Sprint 1 | —     | —         | —            | —           |

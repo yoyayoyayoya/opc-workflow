@@ -1,170 +1,169 @@
 ---
-description: Sprint 审计工作流 — 零信任审核上一个 Sprint 的代码质量（独立会话执行）
+description: Sprint audit workflow — zero-trust review of the previous Sprint's code quality (must run in an isolated session)
 ---
 
 # Sprint Audit Workflow
 
-当用户输入 `/audit` 时触发此工作流。
+Triggered when the user types `/audit`.
 
-## 核心原则
+## Core Principles
 
-1. **零信任**：假设上一个 Sprint 的所有代码和测试都可能是假的
-2. **只审不写**：本 workflow 不修改任何业务代码，只产出审计报告
-3. **独立会话**：必须在与开发 Sprint 不同的会话中执行
-4. **证据驱动**：所有结论必须附带具体文件路径和行号
-
-
----
-
-## Step 1: 加载上下文（自动执行）
-
-// turbo
-
-读取以下文件：
-```
-1. docs/sprint_tracker.md              → 最近完成的 Sprint 编号
-2. docs/sprints/sprint-{N}-review.md   → Sprint 声称做了什么
-3. docs/architecture.md 相关章节       → 应该是什么样
-```
-
-向用户确认：
-> "准备审计 Sprint {N}。Sprint 声称完成了 {n} 个 Task。开始审计？"
+1. **Zero trust** — assume all code and tests from the previous Sprint may be fake
+2. **Review only, never write** — this workflow modifies no business code, only produces an audit report
+3. **Isolated session** — must run in a different session from the development Sprint
+4. **Evidence-driven** — every conclusion must include a specific file path and line number
 
 ---
 
-## Step 2: 测试质量审计
+## Step 1: Load Context (Auto)
 
-### 2.1 空断言扫描
 // turbo
-搜索所有测试文件中的可疑断言：
-```bash
-grep -rn "assert True\|assert.*is not None\|assert.*is None\|pass$" tests/ --include="*.py"
+
+Read the following files:
+```
+1. docs/sprint_tracker.md              → Most recently completed Sprint number
+2. docs/sprints/sprint-{N}-review.md   → What the Sprint claimed to have done
+3. docs/architecture.md (relevant sections) → What it should look like
 ```
 
-标记所有命中为 🔴 可疑。
+Confirm with user:
+> "Ready to audit Sprint {N}. Sprint claims to have completed {n} Tasks. Start audit?"
 
-### 2.2 过度 Mock 扫描
+---
+
+## Step 2: Test Quality Audit
+
+### 2.1 Empty Assertion Scan
 // turbo
-搜索 mock/patch 使用：
+Search all test files for suspicious assertions:
 ```bash
-grep -rn "@patch\|@mock\|MagicMock\|mocker\.patch" tests/ --include="*.py"
+grep -rn "assert True\|assert.*is not None\|assert.*is None\|pass$" tests/
 ```
 
-逐条检查：被 mock 的对象是否是被测逻辑本身？如果是 → 🔴 假测试。
+Flag all hits as 🔴 suspicious.
 
-### 2.3 测试覆盖率检查（强制门禁）
+### 2.2 Over-Mocking Scan
+// turbo
+Search for mock/patch usage:
+```bash
+grep -rn "@patch\|@mock\|MagicMock\|mocker\.patch\|jest\.mock\|vi\.mock\|stub\|sinon" tests/
+```
+
+Check each one: is the mocked object the logic being tested? If yes → 🔴 fake test.
+
+### 2.3 Test Coverage Check (Mandatory Gate)
 
 // turbo
 
-根据项目技术栈（检查 `pyproject.toml` / `package.json` / `Cargo.toml` / `Makefile` 等）推断并运行全量测试套件，将输出保存备查：
+Based on the project tech stack (check `pyproject.toml` / `package.json` / `Cargo.toml` / `Makefile` etc.), infer and run the full test suite, saving output for reference:
 
 ```bash
-# 运行项目的测试命令（如 pytest tests/ / npm test / cargo test 等）
+# Run the project's test command (e.g. pytest tests/ / npm test / cargo test)
 ```
 
 > [!CAUTION]
-> **强制门禁 — 以下条件任意一条不满足，审计必须立即中止，不得继续 Step 3+：**
-> 1. 命令必须成功执行（能看到 `passed` / `failed` 字样）
-> 2. 必须在审计报告中写入类似 `N passed, M failed` 的**实际数字**
-> 3. 如果命令报错（找不到测试运行器等），必须先修复环境，禁止跳过
-> 4. 「代码看起来对」不等于「测试通过」——没有测试输出就没有证据
+> **Mandatory gate — audit must stop immediately if any of the following conditions fail, do not continue to Step 3+:**
+> 1. Command must execute successfully (visible `passed` / `failed` output)
+> 2. Audit report must contain actual numbers like `N passed, M failed`
+> 3. If command errors (test runner not found, etc.), fix the environment first — skipping is forbidden
+> 4. "Code looks right" ≠ "tests pass" — no test output means no evidence
 
-对比 Sprint review 中声称的测试数量 vs 实际运行数量。不一致 → 🔴。
-
----
-
-## Step 3: 变异测试（最致命的一招）
-
-对 Sprint 中修改的每个核心函数：
-
-1. **记录原始代码**
-2. **故意改坏**（例如：`return True` → `return False`，删掉关键行）
-3. **运行相关测试**
-4. **判定**：
-   - 测试变红 ✅ → 测试是真的
-   - 测试仍然绿 🔴 → 假测试，测试根本没验证这个逻辑
-5. **还原代码**
-
-> ⚠️ 每次变异后必须还原。变异测试不应留下任何代码变更。
+Compare test count claimed in Sprint review vs. actual count run. Discrepancy → 🔴.
 
 ---
 
-## Step 4: 逻辑完整性审计
+## Step 3: Mutation Testing (The Deadliest Move)
 
-### 4.1 对比设计文档
-读 architecture.md 中对应模块的设计 → 检查代码是否真的实现了设计。
+For each core function modified in the Sprint:
 
-重点检查：
-- 函数体是否有真实实现（不是 `pass`、`TODO`、`NotImplementedError`）
-- import 是否真的被使用
-- 参数是否真的被消费（不是接收了参数但忽略了）
+1. **Record the original code**
+2. **Deliberately break it** (e.g., `return True` → `return False`, delete a key line)
+3. **Run the related tests**
+4. **Judge**:
+   - Tests go red ✅ → tests are real
+   - Tests stay green 🔴 → fake tests — they don't verify this logic at all
+5. **Restore the code**
 
-### 4.2 功能回归检查
-Sprint review 声称的每个功能点，手动追踪代码路径确认真实存在。
+> ⚠️ Code must be restored after every mutation. Mutation testing must leave zero code changes.
 
 ---
 
-## Step 5: 产出审计报告
+## Step 4: Logic Integrity Audit
 
-写入 `docs/sprints/audit-sprint-{N}.md`：
+### 4.1 Compare Against Design Docs
+Read the relevant module design in `architecture.md` → check if the code actually implements the design.
+
+Key checks:
+- Function bodies have real implementations (not `pass`, `TODO`, `NotImplementedError`, empty stubs)
+- Imports are actually used
+- Parameters are actually consumed (not received and ignored)
+
+### 4.2 Feature Regression Check
+For every feature point the Sprint review claims, manually trace the code path to confirm it actually exists.
+
+---
+
+## Step 5: Produce Audit Report
+
+Write to `docs/sprints/audit-sprint-{N}.md`:
 
 ```markdown
-# Sprint {N} 审计报告
+# Sprint {N} Audit Report
 
-## 审计范围
-Sprint {N}，{n} 个 Task，{m} 个文件变更
+## Audit Scope
+Sprint {N}, {n} Tasks, {m} file changes
 
-## 测试基线（必填，无此项审计报告无效）
+## Test Baseline (required — report is invalid without this)
 ```
-{实际粘贴测试命令输出的最后 3 行，例如：}
+{Paste the last 3 lines of actual test output, e.g.:}
 1 failed, 456 passed in 80.54s
 ```
-> 如果此处为空或写「未运行」，本审计报告自动视为无效。
+> If this section is empty or says "not run", this audit report is automatically invalid.
 
-## 测试质量
+## Test Quality
 
-### 空断言（共 {x} 个）
-| 文件 | 行号 | 代码 | 严重度 |
-|------|------|------|--------|
-| ... | ... | ... | 🔴/🟡 |
+### Empty Assertions ({x} total)
+| File | Line | Code | Severity |
+|------|------|------|----------|
+| ...  | ...  | ...  | 🔴/🟡   |
 
-### 过度 Mock（共 {x} 个）
-| 文件 | 行号 | 被 mock 对象 | 是否 mock 了被测逻辑 |
-|------|------|-------------|-------------------|
-| ... | ... | ... | 🔴/✅ |
+### Over-Mocking ({x} total)
+| File | Line | Mocked object | Mocks the logic being tested? |
+|------|------|---------------|-------------------------------|
+| ...  | ...  | ...           | 🔴/✅                          |
 
-### 变异测试结果（共 {x} 个变异）
-| 函数 | 变异方式 | 测试是否捕获 | 判定 |
-|------|---------|-------------|------|
-| ... | ... | ... | ✅/🔴 |
+### Mutation Test Results ({x} mutations total)
+| Function | Mutation | Tests caught it? | Verdict |
+|----------|----------|-----------------|---------|
+| ...      | ...      | ...             | ✅/🔴   |
 
-## 逻辑完整性
+## Logic Integrity
 
-### 假实现（共 {x} 个）
-| 文件 | 行号 | 问题描述 |
-|------|------|---------|
-| ... | ... | ... |
+### Fake Implementations ({x} total)
+| File | Line | Issue |
+|------|------|-------|
+| ...  | ...  | ...   |
 
-### 设计 vs 实现差距
-| 设计要求 | 实现状态 | 差距 |
-|---------|---------|------|
-| ... | ... | ... |
+### Design vs. Implementation Gap
+| Design requirement | Implementation status | Gap |
+|--------------------|-----------------------|-----|
+| ...                | ...                   | ... |
 
-## 总评
-- 测试可信度：{高/中/低}
-- 代码完整度：{高/中/低}
-- 建议：{通过 / 需修复后重审}
+## Summary
+- Test credibility: {High / Medium / Low}
+- Code completeness: {High / Medium / Low}
+- Recommendation: {Pass / Needs fixes before re-audit}
 
-## 修复清单（如有）
-- [ ] {具体修复项 1}
-- [ ] {具体修复项 2}
+## Fix List (if any)
+- [ ] {specific fix item 1}
+- [ ] {specific fix item 2}
 ```
 
 ---
 
-## Step 6: 汇报
+## Step 6: Report
 
-向用户汇报：
-> "Sprint {N} 审计完成。发现 {x} 个假测试、{y} 个假实现、{z} 个设计差距。建议：{通过/需修复}。详见 audit-sprint-{N}.md。"
+Report to user:
+> "Sprint {N} audit complete. Found {x} fake tests, {y} fake implementations, {z} design gaps. Recommendation: {Pass / Needs fixes}. See audit-sprint-{N}.md."
 
-**强制暂停。等待用户决策。**
+**Mandatory stop. Wait for owner decision.**

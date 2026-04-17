@@ -1,40 +1,40 @@
-# Design Decisions 模板
+# Design Decisions Template
 
-> **使用方法**：将此文件复制到你项目的 `docs/design_decisions.md`，按实际情况填写
-> **格式要求**：倒序排列（最新决策在最前），每条决策用 `D{编号}` 标识
-
----
-
-## 2026-XX-XX
-
-### D001: {决策标题}
-
-**背景**: {为什么需要做这个决策，当时面临什么问题}
-
-**结论**: {最终选择了什么}
-
-**实现方式**:
-```
-{具体实现细节、示意图、代码示例等}
-```
-
-**选择此方案的理由**: {为什么选这个而不是其他选项}
-
-**影响的文件**:
-- `src/...` — {如何按此决策实现}
+> **Usage**: Copy this file to `docs/design_decisions.md` in your project and fill in accordingly.
+> **Format**: Reverse chronological order (newest first). Each decision tagged with `D{number}`.
 
 ---
 
-<!-- 
-新增决策格式：
+## YYYY-MM-DD
 
-### D{下一个编号}: {决策标题}
+### D001: {Decision title}
 
-**背景**: 
+**Background**: {Why this decision was needed — what problem or question prompted it}
 
-**结论**: 
+**Conclusion**: {What was ultimately chosen}
 
-**选择此方案的理由**: 
+**Implementation**:
+```
+{Specific implementation details, diagrams, or code examples}
+```
 
-**影响的文件**: 
+**Why this approach**: {Why this over the alternatives}
+
+**Affected files**:
+- `src/...` — {how this file must implement the decision}
+
+---
+
+<!--
+Template for new decisions:
+
+### D{next number}: {Decision title}
+
+**Background**:
+
+**Conclusion**:
+
+**Why this approach**:
+
+**Affected files**:
 -->

@@ -1,279 +1,278 @@
 ---
-description: Sprint 开发工作流 — 小步可控的迭代开发，每个 Sprint 3-8 个 Task
+description: Sprint development workflow — small, controlled iterations, 3–8 Tasks per Sprint
 ---
 
 # Sprint Development Workflow
 
-当用户输入 `/sprint` 时触发此工作流。
+Triggered when the user types `/sprint`.
 
-## 核心纪律
+## Core Disciplines
 
-1. **短上下文原则**：每个 Sprint 必须在单次会话内完成。Sprint 之间通过文件系统传递上下文，不依赖对话历史。
-2. **强制确认审批**：每个 Task 完成后必须暂停等待用户确认，严禁批量执行。
-3. **零假测试容忍**：禁止 `assert True`、禁止 mock 掉被测逻辑本身、禁止注释失败测试。测试必须测真实行为。
-4. **先验证后开发**：开始新 Task 前，先运行已有测试确认基线是绿的。
-5. **变更最小化**：每个 Task 只改必要的文件，不做"顺便"优化。
-6. **主动研究先于编码**：写代码前必须先研究框架/库的能力边界（读文档、查源码），在 Step 1.8 中产出 `sprint-{N}-capability-map.md` 文件。**此文件是进入 Step 2 的唯一通行证——文件不存在，不得执行任何 Task**。禁止跳过研究直接编码——AI 天生倾向"凑合自己写"，必须用 workflow 强制先研究再动手。
-7. **功能完整由于测试**：写测试的目的是为了检验功能设计的完整性，禁止为了通过测试，产生奇怪的代码异味。
-8. **深究测试失败根本原因**：禁止为了测试通过，不经过研究和分析根本原因就去盲目的修改测试用例。
-9. **审计报告只读**：`docs/sprints/audit-sprint-{N}.md` 由独立审计会话产出，sprint workflow 下**严禁修改**。对审计报告有异议或补充说明，必须写入 `docs/sprints/sprint-{N+1}-review.md` 的「审计异议/说明」章节，不得直接编辑审计报告。
+1. **Short-context principle** — each Sprint must complete within a single session. Context passes between Sprints via the filesystem, not conversation history.
+2. **Mandatory confirmation** — pause and wait for user confirmation after every Task. Batch execution is forbidden.
+3. **Zero fake-test tolerance** — no `assert True`, no mocking the logic being tested, no commenting out failing tests. Tests must verify real behavior.
+4. **Verify before developing** — before starting a new Task, run the existing tests to confirm the baseline is green.
+5. **Minimal changes** — each Task only changes necessary files. No "while I'm here" improvements.
+6. **Research before coding** — before writing any code, study the framework/library capability boundary (read docs, check source). Produce `sprint-{N}-capability-map.md` in Step 1.8. **This file is the only entry pass to Step 2 — if it doesn't exist, no Task may be executed.**
+7. **Functional completeness over test pass rate** — tests exist to verify design completeness, not to be gamed. No code smells introduced to pass tests.
+8. **Root cause analysis on failures** — never blindly modify test cases to make them pass. Dig into the root cause first.
+9. **Audit reports are read-only** — `docs/sprints/audit-sprint-{N}.md` is produced by an independent audit session. It must **never be modified** in a sprint session. Disagreements or notes go into `docs/sprints/sprint-{N+1}-review.md` under "Audit Notes".
 
 ---
 
-## Step 1: 加载上下文（自动执行）
+## Step 1: Load Context (Auto)
 
 // turbo
 
-读取以下文件获取当前进度（**任意文件不存在时，必须向用户明确告警并暂停，不得静默跳过**）：
+Read the following files (if any file is missing, alert the user and pause — never silently skip):
 
 ```
-1. docs/sprint_tracker.md               → 定位当前 Sprint 编号、目标和 Task 列表
-2. docs/design_decisions.md             → 历史架构/产品决策，确保实现符合已确认方案
-3. docs/sprints/sprint-{N}-review.md   → 上一轮 Sprint 的自我回顾（注意：N 是上一个 Sprint 编号）
-   ⚠️ 若不存在：告警「sprint-{N}-review.md 缺失，上一 Sprint 未生成回顾文档」
-4. docs/sprints/audit-sprint-{N}.md    → 【必读】上一 Sprint 的独立审计报告（N 是上一个编号）
-   ⚠️ 若不存在：告警「audit-sprint-{N}.md 缺失，本 Sprint 跳过修复清单阶段」
-   ✅ 若存在：必须完整阅读整个文件，枚举所有「修复清单」条目，不得只读部分
-   🚫 只读文档：审计报告由独立审计会话产出，sprint workflow 下禁止写入或修改
+1. docs/sprint_tracker.md               → Locate current Sprint number, goal, and Task list
+2. docs/design_decisions.md             → Past architecture/product decisions, ensure implementation matches
+3. docs/sprints/sprint-{N}-review.md    → Previous Sprint's self-review (N = previous Sprint number)
+   ⚠️ Missing: warn "sprint-{N}-review.md missing, previous Sprint has no review doc"
+4. docs/sprints/audit-sprint-{N}.md     → [REQUIRED] Previous Sprint's independent audit (N = previous Sprint number)
+   ⚠️ Missing: warn "audit-sprint-{N}.md missing, skipping fix list phase this Sprint"
+   ✅ Found: must read the entire file, enumerate all "Fix List" items — never read only part of it
+   🚫 Read-only: audit reports are produced by an independent audit session — writing or modifying is forbidden
 ```
 
-读完后向用户汇报：
+Report to user:
 
-> "当前进度：Sprint {N}，目标：{goal}，共 {n} 个 Task。
-> 审计报告修复清单：{k} 条待修复。
-> 是否先进入修复清单阶段？"
+> "Current: Sprint {N}, goal: {goal}, {n} Tasks total.
+> Audit fix list: {k} items outstanding.
+> Should we handle the fix list first?"
 
 ---
 
-## Step 1.5: 审计修复清单执行阶段（若审计报告存在且有未关闭修复项）
+## Step 1.5: Audit Fix Phase (if audit report exists and has open items)
 
-> **核心原则**: 审计报告的修复清单优先于新 Task。旧债不清，不开新坑。
+> **Core principle**: Audit fix list takes priority over new Tasks. No new holes before old debt is cleared.
 
-若 Step 1 加载的审计报告中存在未关闭（未打 ✅）的修复项：
+If the audit report loaded in Step 1 has unclosed (un-✅) fix items:
 
-1. **完整枚举**：将所有修复项以编号列表展示给用户，每条包含：
-   - 文件路径
-   - 问题描述（一句话）
-   - 严重度（🔴/🟡）
-2. **逐条确认**：每条修复项作为独立子 Task，执行完整的 TDD 循环（2.3 节），用户逐条确认
-3. **全绿后继续**：所有修复项关闭、全量测试绿色后，才进入 Step 2（新 Task）
+1. **Enumerate all** — list every fix item for the user, each with:
+   - File path
+   - Problem description (one sentence)
+   - Severity (🔴/🟡)
+2. **Confirm one by one** — each fix item is an independent sub-Task with its own TDD loop (Section 2.3), user confirms each
+3. **All green before continuing** — all fix items closed, full test suite green, then proceed to Step 2
 
-**此阶段不计入 Sprint Task 计数，但必须写入本次 sprint-{N+1}-review.md 的「遗留修复」章节。**
+**This phase does not count toward Sprint Task count, but must be written into `sprint-{N+1}-review.md` under "Inherited Fixes".**
 
 ---
 
-## Step 1.8: 研究阶段（强制，Sprint 开始时一次性执行）
+## Step 1.8: Research Phase (Mandatory — runs once at Sprint start)
 
-> 🔬 **核心纪律 #6 强制执行点**：写任何代码前必须先研究整个 Sprint 的框架能力边界，禁止直接进入实现。
+> 🔬 **Discipline #6 enforcement point**: No code before studying the full Sprint's framework capability boundary.
 
-在进入逐 Task 循环之前，必须先整体研究并产出 `docs/sprints/sprint-{N}-capability-map.md`。
+Before entering the Task-by-Task loop, produce `docs/sprints/sprint-{N}-capability-map.md`.
 
-**研究步骤：**
+**Research steps:**
 
-1. **纵览所有 Task**：遍历当前 Sprint 的所有 Task，识别全部涉及的外部框架/库
-2. **研究能力边界**：对每个依赖项，通过以下方式之一确认其能力：
-   - 读官方文档或 CHANGELOG（记录版本和关键 API）
-   - 查源码（记录关键类/函数签名）
-   - 查项目中已有使用先例（记录文件路径）
-3. **创建 `docs/sprints/sprint-{N}-capability-map.md`**，结构要求见下方模板
+1. **Scan all Tasks** — go through every Task in the current Sprint, identify all external frameworks/libraries involved
+2. **Study capability boundary** — for each dependency, confirm its capabilities via one of:
+   - Official docs or CHANGELOG (record version + key APIs)
+   - Source code (record key class/function signatures)
+   - Existing usage in the project (record file paths)
+3. **Create `docs/sprints/sprint-{N}-capability-map.md`** — required structure below
 
-### 文档模板
+### Document Template
 
 ```markdown
-# Sprint {N} 框架能力映射
+# Sprint {N} Capability Map
 
-> **Sprint 目标**: {目标}
-> **框架版本**: {主要框架及版本}
-> **日期**: {YYYY-MM-DD}
-
----
-
-## T01: {Task 标题}
-
-| 产品功能 | 涉及框架/库 | 决策     | 理由         |
-| -------- | ----------- | -------- | ------------ |
-| {子功能} | {框架}      | ✅/⚠️/❌ | {一句话理由} |
-
-### 关键 API 签名
-
-{贴出验证过的构造函数/方法签名，含参数类型和注释}
-
-### 已知问题
-
-{研究中发现的风险、限制、不兼容项。无则写「无」}
-
-### 设计决策（若有）
-
-{基于研究结论做出的方案选择，说明选了什么、为什么不选另一个}
-
-### 调用架构（若涉及多模块交互）
-
-{用文本树或伪代码展示调用链路}
+> **Sprint goal**: {goal}
+> **Framework versions**: {main frameworks and versions}
+> **Date**: {YYYY-MM-DD}
 
 ---
 
-（每个 Task 重复以上结构）
+## T01: {Task title}
+
+| Feature | Framework/lib | Decision | Rationale |
+|---------|--------------|----------|-----------|
+| {sub-feature} | {framework} | ✅/⚠️/❌ | {one-line rationale} |
+
+### Key API Signatures
+
+{Paste verified constructor/method signatures with parameter types and comments}
+
+### Known Issues
+
+{Risks, limitations, incompatibilities found during research. Write "None" if none.}
+
+### Design Decisions (if any)
+
+{If multiple options existed, state what was chosen and why the alternative was rejected}
+
+### Call Architecture (if multiple modules interact)
+
+{Text tree or pseudocode showing the call chain}
 
 ---
 
-## 不使用 / 不适用的框架能力
-
-| 框架能力    | 不使用理由 |
-| ----------- | ---------- |
-| {框架.功能} | {理由}     |
+(Repeat above structure for each Task)
 
 ---
 
-## 现有代码复用清单
+## Unused / Not Applicable Framework Features
 
-| 已有模块 (文件路径) | Sprint {N} 用途 |
-| ------------------- | --------------- |
-| `src/...`           | {用途}          |
+| Framework feature | Reason not used |
+|-------------------|----------------|
+| {framework.feature} | {reason} |
 
 ---
 
-## 变更最小化清单
+## Existing Code Reuse
 
-| 文件      | 变更类型  | Task | 范围         |
-| --------- | --------- | ---- | ------------ |
-| `src/...` | 新建/修改 | T0x  | {一句话描述} |
+| Existing module (file path) | Sprint {N} usage |
+|-----------------------------|-----------------|
+| `src/...`                   | {usage}         |
+
+---
+
+## Minimal Change List
+
+| File      | Change type   | Task | Scope         |
+|-----------|---------------|------|---------------|
+| `src/...` | New / Modify  | T0x  | {one-line description} |
 ```
 
-### 质量检查清单（产出文档必须满足以下全部条件）
+### Quality Checklist (document must satisfy all of the following)
 
-- [ ] **按 Task 分节**：每个 Task 有独立章节，不是一张大表概括了事
-- [ ] **API 签名已验证**：关键 API 签名来自实际读源码/文档，不是凭记忆猜测
-- [ ] **已知问题已记录**：研究中发现的风险、限制、不兼容项均已列出（无则明确写「无」）
-- [ ] **设计决策有理由**：凡是有多个方案可选的地方，说明选了什么、为什么不选另一个
-- [ ] **调用架构已画出**：涉及多模块交互的 Task 有文本调用链路图
-- [ ] **变更最小化清单完整**：列出所有将要新建/修改的文件，标注归属 Task
-- [ ] **不使用的能力已说明**：明确列出研究过但决定不用的框架能力及理由
+- [ ] **Sectioned by Task** — each Task has its own section, not one big table for everything
+- [ ] **API signatures verified** — key API signatures come from actually reading source/docs, not from memory
+- [ ] **Known issues recorded** — risks, limitations, incompatibilities listed (explicitly write "None" if none)
+- [ ] **Design decisions justified** — wherever multiple options existed, state what was chosen and why
+- [ ] **Call architecture drawn** — Tasks involving multiple modules have a text call chain diagram
+- [ ] **Minimal change list complete** — all files to be created/modified listed, with owning Task
+- [ ] **Unused capabilities explained** — explicitly list framework features researched but decided against, with reason
 
-**此步骤完成后暂停，等用户确认研究结论，再进入 Step 2。**
+**Pause after this step. Wait for user to confirm research conclusions before entering Step 2.**
 
 ---
 
-## Step 2: 逐 Task 执行（强约束循环）
+## Step 2: Task-by-Task Execution (Strict Loop)
 
 > [!CAUTION]
-> **🚦 能力映射文件门禁（强制，每次进入 Step 2 前必须执行）**
-> 
-> 在执行任何 Task 之前，必须先验证 `docs/sprints/sprint-{N}-capability-map.md` 已存在且有实质内容（非空文件）。
-> 
-> - ✅ 文件存在 → 继续执行 2.1
-> - ❌ 文件不存在 → **立即停止，返回 Step 1.8 完成研究，生成文件后才能继续**
-> - ❌ 文件存在但为空模板 → **同上，必须填充研究结论后才能继续**
-> 
-> 此规则没有例外。「我已经了解这个框架」不是跳过的理由——研究结论必须写入文件，不能只在 AI 会话记忆中。
+> **🚦 Capability Map Gate (mandatory — must execute every time before entering Step 2)**
+>
+> Before executing any Task, verify that `docs/sprints/sprint-{N}-capability-map.md` exists and has substantive content (not an empty file).
+>
+> - ✅ File exists → proceed to 2.1
+> - ❌ File missing → **stop immediately, return to Step 1.8 to complete research, then continue**
+> - ❌ File exists but is an empty template → **same as above — must fill in research conclusions first**
+>
+> No exceptions. "I already know this framework" is not a reason to skip — research conclusions must be written to a file, not kept only in AI session memory.
 
-对 sprint_tracker.md 中当前 Sprint 的每个 Task，执行以下循环：
+For each Task in the current Sprint from sprint_tracker.md, execute the following loop:
 
-### 2.1 确认基线
-
-// turbo
-
-根据 Sprint 任务涉及的文件和技术栈，推断并运行项目的全量测试套件（检查 `pyproject.toml` / `package.json` / `Cargo.toml` / `Makefile` 等确认正确命令）。确认基线是绿的。
-
-如果基线不绿，必须先修复，不能在红色基线上写新代码。
-
-### 2.2 展示 Task 方案
-
-打开 `docs/sprints/sprint-{N}-capability-map.md`，找到当前 Task 对应的章节，基于其中**已验证的 API 签名和设计决策**，向用户展示：
-
-- 要改哪些文件（必须在 capability-map 的「变更最小化清单」中已列出）
-- 怎么改（使用 capability-map 中记录的 API，不得使用未经研究验证的 API）
-- 写什么测试
-- 预期结果
-
-⚠️ 如果方案中使用了 capability-map 未提及的 API 或文件，必须先更新 capability-map（补充研究），再展示方案。
-
-**暂停，等用户批准。**
-
-### 2.3 TDD 执行
-
-1. **先写测试**：编写测试用例（必须测真实行为，禁止空断言）
-2. **运行测试确认红色**：新测试必须失败（证明它确实在测东西）
-3. **写实现代码**：让测试变绿
-4. **运行全量测试**：确认没有回归
-
-### 2.4 验证与提交
+### 2.1 Verify Baseline
 
 // turbo
 
-根据 Sprint 任务的技术栈，运行全量测试和代码检查，向用户展示结果。**暂停，等用户确认本 Task 通过。**
+Based on the files and tech stack in the Sprint Tasks, infer and run the project's full test suite (check `pyproject.toml` / `package.json` / `Cargo.toml` / `Makefile` etc. to confirm the correct command). Confirm baseline is green.
 
-### 2.5 更新进度
+If baseline is not green, fix it first. Never write new code on a red baseline.
 
-将 sprint_tracker.md 中对应 Task 标记为 `[x]`。
+### 2.2 Present Task Plan
 
-### 2.6 循环
+Open `docs/sprints/sprint-{N}-capability-map.md`, find the section for the current Task, and based on its **verified API signatures and design decisions**, show the user:
 
-回到 2.1，执行下一个 Task。直到当前 Sprint 所有 Task 完成。
+- Which files to change (must already be listed in capability-map's "Minimal Change List")
+- How to change them (use APIs recorded in capability-map — no unverified APIs)
+- What tests to write
+- Expected results
+
+⚠️ If the plan uses APIs or files not in the capability-map, update the capability-map first (research those additions), then present the plan.
+
+**Pause. Wait for user approval.**
+
+### 2.3 TDD Execution
+
+1. **Write tests first** — write test cases (must test real behavior, no empty assertions)
+2. **Run tests to confirm red** — new tests must fail (proves they're actually testing something)
+3. **Write implementation** — make the tests green
+4. **Run full test suite** — confirm no regressions
+
+### 2.4 Validate & Commit
+
+// turbo
+
+Based on the Sprint's tech stack, run the full test suite and linter, show results to user. **Pause. Wait for user to confirm this Task passes.**
+
+### 2.5 Update Progress
+
+Mark the corresponding Task as `[x]` in sprint_tracker.md.
+
+### 2.6 Loop
+
+Return to 2.1 for the next Task. Repeat until all Tasks in the current Sprint are complete.
 
 ---
 
-## Step 3: Sprint 回顾（自动执行）
+## Step 3: Sprint Review (Auto)
 
-> **职责说明**：sprint-{N}-review.md 由 **Sprint N 的 sprint workflow（本步骤）** 负责生成，不由审计会话生成。
+> **Responsibility**: `sprint-{N}-review.md` is generated by **Sprint N's sprint workflow (this step)**, not by the audit session.
 
-所有 Task 完成后，生成 Sprint 回顾文档。写入 `docs/sprints/sprint-{N}-review.md`：
+After all Tasks complete, generate the Sprint review doc. Write to `docs/sprints/sprint-{N}-review.md`:
 
-> **时序说明**：
+> **Timing note**:
 >
-> - Sprint N 结束 → 本步骤生成 `sprint-N-review.md`（此时 audit-sprint-N 尚未产生）
-> - 独立审计 → 生成 `audit-sprint-N.md`
-> - Sprint N+1 开始 → 读取 audit-sprint-N.md → 若有说明，写入 `sprint-(N+1)-review.md` 的「审计异议/说明」章节
+> - Sprint N ends → this step generates `sprint-N-review.md` (audit-sprint-N does not exist yet)
+> - Independent audit → generates `audit-sprint-N.md`
+> - Sprint N+1 starts → reads audit-sprint-N.md → if there are notes, write to `sprint-(N+1)-review.md` under "Audit Notes"
 >
-> 因此：sprint-N-review.md 中的「审计异议/说明」章节，针对的是 **audit-sprint-(N-1).md**（上一轮审计），而非本轮审计。
+> Therefore: the "Audit Notes" section in `sprint-N-review.md` addresses **audit-sprint-(N-1).md** (the previous audit), not the current one.
 
 ```markdown
 # Sprint {N} Review
 
-## 目标
+## Goal
 
-{Sprint 目标}
+{Sprint goal}
 
-## 遗留修复（来自 audit-sprint-{N-1}.md）
+## Inherited Fixes (from audit-sprint-{N-1}.md)
 
-- [x] {修复项描述}（若有）
+- [x] {fix item description} (if any)
 
-## 审计异议/说明（对 audit-sprint-{N-1}.md 内容有补充时写此处）
+## Audit Notes (for audit-sprint-{N-1}.md, if there is additional context)
 
-- {若对某条审计判定有补充说明或异议，在此如实记录，不得修改原审计报告}
+- {If there is a supplement or disagreement with an audit finding, record it here — do not modify the audit report}
 
-## 完成的 Task
+## Completed Tasks
 
-- [x] T01: {描述}（测试：{通过数}/{总数}）
+- [x] T01: {description} (tests: {passed}/{total})
 - [x] T02: ...
 
-## 代码变更
+## Code Changes
 
-- `{文件路径}` — {变更描述}
+- `{file path}` — {change description}
 
-## 验证结果
+## Validation Results
 
-测试: {通过}/{总数} pass
-Lint: {错误数} errors
+Tests: {passed}/{total} pass
+Lint: {error count} errors
 
-## 遗留问题
+## Known Issues
 
-- {如有}
+- {if any}
 
-## 下一个 Sprint 前置条件
+## Prerequisites for Next Sprint
 
-- {如有}
+- {if any}
 ```
 
-更新 `docs/sprint_tracker.md` 标记当前 Sprint 为完成。
-更新 `docs/changes.md` 记录本 Sprint 的变更。
-确认 `docs/sprints/sprint-{N}-capability-map.md` 已包含本 Sprint 所有 Task 的研究结论。
+Update `docs/sprint_tracker.md` to mark the current Sprint as complete.
+Confirm `docs/sprints/sprint-{N}-capability-map.md` contains research conclusions for all Tasks in this Sprint.
 
 ---
 
-## Step 4: 等待验收
+## Step 4: Await Review
 
-向用户汇报：
+Report to user:
 
-> "Sprint {N} 完成。{n} 个 Task 全部通过，测试 {x}/{y} pass。请审查代码或运行 `/audit` 启动独立审计。"
+> "Sprint {N} complete. {n} Tasks all passed, tests {x}/{y} pass. Review the code or run `/audit` to start the independent audit."
 
-**强制暂停。Sprint 到此结束。下一个 Sprint 必须在新会话中启动。**
+**Mandatory stop. Sprint ends here. The next Sprint must be started in a new session.**
