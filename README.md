@@ -184,8 +184,9 @@ Repeat until the audit passes. Only then plan the next Sprint.
 
 ### Step 4 — Repeat
 
-Once the audit passes, start the next Sprint with `/plan_sprint` in a new session.
-The closed audit findings carry forward automatically as resolved context.
+Once the audit passes, open a new session and type `/sprint` to start the next Sprint.
+
+Only run `/plan_sprint` first if you need to plan new Sprints that aren't yet in `sprint_tracker.md`.
 
 ---
 

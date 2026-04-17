@@ -184,8 +184,9 @@ AI 会（以对上一个会话零信任的独立审阅者身份）：
 
 ### 第 4 步 — 循环
 
-audit 通过后，在新会话中输入 `/plan_sprint` 开始下一个 Sprint。
-已关闭的审计发现作为上下文自动延续到下一轮。
+audit 通过后，打开新会话输入 `/sprint` 开始下一个 Sprint。
+
+只有当 `sprint_tracker.md` 里还没有已规划的 Sprint 时，才需要先运行 `/plan_sprint`。
 
 ---
 
