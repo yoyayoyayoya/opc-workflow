@@ -106,83 +106,79 @@ The script will:
 
 Doc templates (`sprint_tracker.md`, `design_decisions.md`) always go to `docs/`.
 
-## Workflow Reference
+## How to Use
 
-### `/plan_sprint` — Sprint Planning
-
-- Reads product docs + past decisions
-- Discusses Sprint goal and Task breakdown with you
-- Writes conclusions to `sprint_tracker.md` and `design_decisions.md`
-- **Must run in an isolated session** (separate from `/sprint`)
-
-### `/sprint` — Sprint Development
-
-**9 core disciplines:**
-
-1. Each Sprint completes within a single session (short-context principle)
-2. Pause and wait for confirmation after every Task
-3. Zero fake-test tolerance (no `assert True`)
-4. Verify baseline is green before starting a new Task
-5. Minimal changes (only touch necessary files)
-6. **Research before coding** (must study framework capabilities first, produce a capability map)
-7. Functional completeness over test pass rate
-8. Dig into the root cause of every test failure
-9. Audit reports are read-only (never modify them in a sprint session)
-
-### `/audit` — Zero-Trust Audit
-
-- **Must run in an isolated session**
-- Empty assertion scan (`assert True` / `assert is not None`)
-- Over-mocking scan (did you mock the logic being tested?)
-- Mutation testing (deliberately break code — tests must go red)
-- Logic integrity check (against design docs)
-- Produces an audit report (evidence-driven, with file paths and line numbers)
+> **The core mechanic: every command runs in a separate AI session.**
+> This prevents context drift and eliminates confirmation bias in audits.
 
 ---
 
-## Design Principles
+### Before your first Sprint — set up docs
 
-**Short context + clear boundaries**
+Create these files in your project's `docs/` folder (templates installed by the setup script):
 
-Each Sprint completes in a single session. Context passes between Sprints via the filesystem. This solves the root cause of LLM long-context degradation.
-
-**Independent audit**
-
-`/audit` must run in a different session from `/sprint`. This eliminates confirmation bias — developers cannot audit their own code.
-
-**Evidence-driven**
-
-Every conclusion in an audit report must include a specific file path and line number. Conclusions without evidence don't count.
-
-**Research before coding**
-
-AI naturally tends to "just write code" instead of "study framework capabilities first." `/sprint` forces a capability map to be produced at the start of every Sprint before any implementation begins.
+| File | Purpose |
+|------|---------|
+| `sprint_tracker.md` | Track Sprint goals, Tasks, and status |
+| `design_decisions.md` | Log architecture and product decisions |
+| `architecture.md` | Technical design (optional but recommended) |
+| `product_vision.md` | Product direction (optional) |
 
 ---
 
-## Full Sprint Lifecycle
+### Step 1 — Plan: `/plan_sprint`
 
-```
-/plan_sprint  (Session A)
-    Read product docs + past decisions
-    Discuss Task breakdown with you
-    Write to sprint_tracker.md
-        ↓ Close session
-/sprint  (Session B)
-    Research framework capabilities → produce capability map
-    Execute TDD loop per Task
-    Pause for confirmation after each Task
-    Generate sprint-N-review.md
-        ↓ Close session
-/audit  (Session C)
-    Independently audit Sprint N
-    Mutation testing + fake test scan
-    Produce audit-sprint-N.md
-        ↓
-Owner review → Pass / Send back for fixes
-```
+**Open a new AI session. Type `/plan_sprint`.**
+
+The AI will:
+1. Read your docs and past decisions
+2. Show you a gap analysis — what's done vs. what's missing
+3. Discuss the next Sprint's goal and Task breakdown with you
+4. Ask for your decisions on open architecture questions
+5. Write the final plan to `sprint_tracker.md`
+
+At the end you have a Sprint plan with concrete Tasks ready to execute.
+**Close this session.**
 
 ---
+
+### Step 2 — Build: `/sprint`
+
+**Open a new AI session. Type `/sprint`.**
+
+The AI will:
+1. Read the Sprint plan from `sprint_tracker.md`
+2. **Research** — study all involved frameworks and produce `docs/sprints/sprint-N-capability-map.md` before writing any code
+3. Pause and wait for you to confirm the research conclusions
+4. Execute each Task in a TDD loop: write test → confirm it's red → write implementation → confirm it's green
+5. Pause after every Task for your approval
+6. Generate `docs/sprints/sprint-N-review.md` when all Tasks are done
+
+**Close this session.**
+
+---
+
+### Step 3 — Audit: `/audit`
+
+**Open a new AI session. Type `/audit`.**
+
+The AI will (as an independent reviewer with zero trust in the previous session):
+1. Scan for fake tests (empty assertions, over-mocking)
+2. Run mutation tests — deliberately break each core function to verify tests catch it
+3. Check logic integrity against your design docs
+4. Produce `docs/sprints/audit-sprint-N.md` with evidence (file paths + line numbers)
+
+**Read the audit report. Decide: pass or send back for fixes.**
+
+---
+
+### Step 4 — Repeat
+
+Start the next Sprint with `/plan_sprint` in a new session.
+The audit findings automatically feed into the next Sprint's fix list.
+
+---
+
 
 ## Live Case Study
 

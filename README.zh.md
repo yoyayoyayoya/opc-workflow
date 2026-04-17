@@ -106,85 +106,79 @@ iex (iwr -useb 'https://raw.githubusercontent.com/yoyayoyayoya/opc-workflow/main
 
 文档模板（`sprint_tracker.md`、`design_decisions.md`）始终安装到 `docs/`。
 
----
+## 如何使用
 
-## 工作流说明
-
-### `/plan_sprint` — Sprint 规划
-
-- 读取产品文档 + 历史决策
-- 与你讨论 Sprint 目标和 Task 拆解
-- 将结论写入 `sprint_tracker.md` 和 `design_decisions.md`
-- **必须在独立会话执行**（与 /sprint 分开）
-
-### `/sprint` — Sprint 开发
-
-**9 条核心纪律：**
-
-1. 每个 Sprint 在单次会话内完成（短上下文原则）
-2. 每个 Task 完成后暂停等待确认
-3. 零假测试容忍（禁止 `assert True`）
-4. 先验证基线再开始新 Task
-5. 变更最小化（只改必要文件）
-6. **研究先于编码**（写代码前必须研究框架能力，产出能力映射表）
-7. 功能完整性优于测试通过率
-8. 深究测试失败根本原因
-9. 审计报告只读（不在 sprint 会话中修改）
-
-### `/audit` — 零信任审计
-
-- **必须在独立会话执行**
-- 空断言扫描（`assert True` / `assert is not None`）
-- 过度 Mock 扫描（是否 mock 了被测逻辑本身）
-- 变异测试（故意改坏代码，测试必须变红）
-- 逻辑完整性检查（对照设计文档）
-- 产出审计报告（证据驱动，附文件路径和行号）
+> **核心机制：每个命令在独立的 AI 会话中执行。**
+> 这可以防止上下文漂移，并消除审计中的确认偏差。
 
 ---
 
-## 设计原则
+### 开始前——准备项目文档
 
-**短上下文 + 清晰边界**
+在项目的 `docs/` 目录下创建以下文件（安装脚本会自动生成模板）：
 
-每个 Sprint 在单次会话内完成，Sprint 之间通过文件系统传递上下文。这解决了 LLM 长上下文退化的根本问题。
-
-**独立审计**
-
-`/audit` 必须在与 `/sprint` 不同的会话中执行。目的是消除开发会话的确认偏差——开发者不能自己审计自己的代码。
-
-**证据驱动**
-
-审计报告中的所有结论必须附带具体文件路径和行号。没有证据的结论不计入。
-
-**研究先于编码**
-
-AI 天生倾向"直接写代码"而不是"先研究框架能力"。`/sprint` 强制在每个 Sprint 开始时产出能力映射表，再进入实现。
+| 文件 | 用途 |
+|------|------|
+| `sprint_tracker.md` | 追踪 Sprint 目标、Task 和状态 |
+| `design_decisions.md` | 记录架构和产品决策 |
+| `architecture.md` | 技术设计文档（可选，但强烈建议）|
+| `product_vision.md` | 产品方向（可选）|
 
 ---
 
-## 完整 Sprint 生命周期
+### 第 1 步 — 规划：`/plan_sprint`
 
-```
-/plan_sprint (会话 A)
-    读取产品文档 + 历史决策
-    与你讨论 Task 拆解
-    写入 sprint_tracker.md
-        ↓ 关闭会话
-/sprint (会话 B)
-    研究框架能力 → 产出能力映射表
-    逐 Task 执行 TDD 循环
-    每 Task 后暂停确认
-    生成 sprint-N-review.md
-        ↓ 关闭会话
-/audit (会话 C)
-    独立审核 Sprint N
-    变异测试 + 假测试扫描
-    产出 audit-sprint-N.md
-        ↓
-CEO 验收 → 通过 / 打回修复
-```
+**打开新的 AI 会话，输入 `/plan_sprint`。**
+
+AI 会：
+1. 读取你的文档和历史决策
+2. 展示差距分析——已完成了什么、还缺什么
+3. 与你讨论下一个 Sprint 的目标和 Task 拆解
+4. 就开放的架构问题征求你的决策
+5. 将最终计划写入 `sprint_tracker.md`
+
+结束后你将得到一份有具体 Task 的 Sprint 计划，可以直接执行。
+**关闭此会话。**
 
 ---
+
+### 第 2 步 — 开发：`/sprint`
+
+**打开新的 AI 会话，输入 `/sprint`。**
+
+AI 会：
+1. 从 `sprint_tracker.md` 读取 Sprint 计划
+2. **研究阶段**——研究所有涉及的框架，在写任何代码之前产出 `docs/sprints/sprint-N-capability-map.md`
+3. 暂停，等你确认研究结论
+4. 逐个 Task 执行 TDD 循环：写测试 → 确认为红 → 写实现 → 确认为绿
+5. 每个 Task 后暂停，等你批准
+6. 所有 Task 完成后生成 `docs/sprints/sprint-N-review.md`
+
+**关闭此会话。**
+
+---
+
+### 第 3 步 — 审计：`/audit`
+
+**打开新的 AI 会话，输入 `/audit`。**
+
+AI 会（以对上一个会话零信任的独立审阅者身份）：
+1. 扫描假测试（空断言、过度 Mock）
+2. 运行变异测试——故意改坏每个核心函数，验证测试能捕获到
+3. 对照设计文档检查逻辑完整性
+4. 产出 `docs/sprints/audit-sprint-N.md`（含文件路径和行号的证据）
+
+**读取审计报告，决定：通过，或打回修复。**
+
+---
+
+### 第 4 步 — 循环
+
+在新会话中输入 `/plan_sprint` 开始下一个 Sprint。
+审计发现的问题会自动进入下一个 Sprint 的修复清单。
+
+---
+
 
 ## 活体案例
 
