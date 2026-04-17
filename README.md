@@ -77,46 +77,26 @@ The critical bug was found during the first independent audit — an execution m
 
 ## Quick Start
 
-### 1. Copy workflows into your project
-
 ```bash
-mkdir -p .agents/workflows
-curl -o .agents/workflows/plan_sprint.md \
-  https://raw.githubusercontent.com/yourusername/opc-workflow/main/workflows/plan_sprint.md
-curl -o .agents/workflows/sprint.md \
-  https://raw.githubusercontent.com/yourusername/opc-workflow/main/workflows/sprint.md
-curl -o .agents/workflows/audit.md \
-  https://raw.githubusercontent.com/yourusername/opc-workflow/main/workflows/audit.md
+bash <(curl -sSL https://raw.githubusercontent.com/yoyayoyayoya/opc-workflow/main/install.sh)
 ```
 
-### 2. Set up your project docs (workflows read these files)
+The script will:
+1. Ask for your project directory path
+2. Let you choose your AI tool (Claude Code / Antigravity / Cursor / Kiro / Other)
+3. Download the workflow files into the correct location for your tool
+4. Set up `docs/` templates if they don't already exist
 
-```
-docs/
-  ├── sprint_tracker.md    → Sprint progress tracking (see docs/templates/sprint_tracker.md)
-  ├── design_decisions.md  → Architecture / product decision log
-  ├── product_vision.md    → Product direction (optional)
-  └── architecture.md      → Technical architecture (optional)
-```
+### Resulting file locations
 
-### 3. Trigger in your AI tool
+| Tool | Workflow files |
+|------|----------------|
+| Claude Code / Antigravity | `.agents/workflows/` |
+| Cursor | `.agents/workflows/` (reference via `@file`) |
+| Kiro | `.kiro/steering/` (auto-loaded) |
+| Other | `workflows/` |
 
-**Claude Code / Antigravity (Google Deepmind)**
-Place files in `.agents/workflows/`, then type:
-```
-/plan_sprint
-```
-
-**Cursor**
-Reference the workflow file with `@file`:
-```
-@.agents/workflows/plan_sprint.md start planning the next Sprint
-```
-
-**Kiro**
-Place files in `.kiro/steering/`, Kiro loads them automatically. Then type `/plan_sprint`.
-
----
+Doc templates (`sprint_tracker.md`, `design_decisions.md`) always go to `docs/`.
 
 ## Workflow Reference
 

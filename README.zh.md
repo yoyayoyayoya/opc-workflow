@@ -77,44 +77,26 @@ workflows/
 
 ## 快速开始
 
-### 1. 复制工作流到你的项目
-
 ```bash
-mkdir -p .agents/workflows
-curl -o .agents/workflows/plan_sprint.md \
-  https://raw.githubusercontent.com/yourusername/opc-workflow/main/workflows/plan_sprint.md
-curl -o .agents/workflows/sprint.md \
-  https://raw.githubusercontent.com/yourusername/opc-workflow/main/workflows/sprint.md
-curl -o .agents/workflows/audit.md \
-  https://raw.githubusercontent.com/yourusername/opc-workflow/main/workflows/audit.md
+bash <(curl -sSL https://raw.githubusercontent.com/yoyayoyayoya/opc-workflow/main/install.sh)
 ```
 
-### 2. 准备项目文档（工作流会读取这些文件）
+脚本会：
+1. 询问你的项目目录路径
+2. 选择你的 AI 工具（Claude Code / Antigravity / Cursor / Kiro / 其他）
+3. 将工作流文件下载到对应工具的正确位置
+4. 如果 `docs/` 不存在，自动安装文档模板
 
-```
-docs/
-  ├── sprint_tracker.md    → Sprint 进度追踪（见 docs/templates/sprint_tracker.md）
-  ├── design_decisions.md  → 架构/产品决策记录
-  ├── product_vision.md    → 产品方向（可选）
-  └── architecture.md      → 技术架构（可选）
-```
+### 安装位置
 
-### 3. 在你的 AI 工具中触发
+| 工具 | 工作流文件位置 |
+|------|--------------|
+| Claude Code / Antigravity | `.agents/workflows/` |
+| Cursor | `.agents/workflows/`（通过 `@file` 引用）|
+| Kiro | `.kiro/steering/`（自动加载）|
+| 其他 | `workflows/` |
 
-**Claude Code / Antigravity（Google Deepmind）**
-文件放入 `.agents/workflows/`，在对话中直接输入：
-```
-/plan_sprint
-```
-
-**Cursor**
-使用 `@file` 引用工作流文件：
-```
-@.agents/workflows/plan_sprint.md 开始规划下一个 Sprint
-```
-
-**Kiro**
-将文件放入 `.kiro/steering/`，Kiro 会自动加载，然后在对话中输入 `/plan_sprint`。
+文档模板（`sprint_tracker.md`、`design_decisions.md`）始终安装到 `docs/`。
 
 ---
 
