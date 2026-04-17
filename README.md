@@ -97,15 +97,22 @@ docs/
   └── architecture.md      → 技术架构（可选）
 ```
 
-### 3. 开始第一个 Sprint
+### 3. 在你的 AI 工具中触发
 
-在你的 AI 工具（Claude / Cursor / Kiro）中输入：
-
+**Claude Code / Antigravity（Google Deepmind）**
+文件放入 `.agents/workflows/`，在对话中直接输入：
 ```
 /plan_sprint
 ```
 
-AI 会读取你的项目文档，与你讨论，制定 Sprint 计划。
+**Cursor**
+使用 `@file` 引用工作流文件：
+```
+@.agents/workflows/plan_sprint.md 开始规划下一个 Sprint
+```
+
+**Kiro**
+将文件放入 `.kiro/steering/`，Kiro 会自动加载，然后在对话中输入 `/plan_sprint`。
 
 ---
 
