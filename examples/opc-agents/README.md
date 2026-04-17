@@ -1,15 +1,8 @@
-# OPC Agents — 活体案例
+# 活体案例
 
-> OPC Agents 是一个 AI Agent 协作平台，使用 OPC Workflow 进行开发。
-> 它是 opc-workflow 方法论有效性的持续验证。
+> 作者正在用 OPC Workflow 开发一个本地 AI 工程项目，以下是真实数据，持续更新。
 
-## 项目概况
-
-- **仓库**: [opc-agents](https://github.com/yourusername/opc-agents)
-- **技术栈**: Python / FastAPI / CrewAI
-- **开始使用 OPC Workflow**: 2025-10-xx（Sprint 1 起）
-
-## 实战数据（持续更新）
+## 实战数据
 
 | 指标 | 数据 | 最后更新 |
 |------|------|---------|
@@ -21,15 +14,15 @@
 
 ## 关键发现
 
-### Sprint 3 审计：Harness 安全边界绕过
+### Sprint 3 审计：安全边界绕过 Bug
 
-**现象**：`sprint_executor.py` 直接实例化 Agent，绕过了 `AgentRegistry`。
+**现象**：某执行模块直接实例化组件，绕过了注册中心。
 
-**影响**：Harness 安全边界、工具注入、内存系统全部失效。
+**影响**：安全边界、工具注入、内存系统全部失效。
 
 **被发现方式**：独立 `/audit` 会话，变异测试捕获。
 
-**为什么开发者自己没发现**：开发者在开发会话中写了代码也写了测试，确认偏差导致盲区。独立审计会话消除了这个偏差。
+**为什么开发者自己没发现**：开发者在 Sprint 会话中写了代码也写了测试，确认偏差导致盲区。独立审计会话消除了这个偏差。
 
 ## Sprint 历史
 

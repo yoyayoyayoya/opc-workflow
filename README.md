@@ -56,7 +56,7 @@ workflows/
 
 ## 📊 实战数据
 
-> 本仓库作者用 OPC Workflow 开发 [OPC Agents](https://github.com/yourusername/opc-agents) 项目，以下是真实数据：
+> 以下数据来自作者用 OPC Workflow 开发的一个本地实践项目，真实记录，持续更新：
 
 | 指标 | 数据 |
 |------|------|
@@ -69,7 +69,7 @@ workflows/
 
 这些数字真实，不是演示数据。
 
-致命 Bug 是在第一次独立审计中发现的——`sprint_executor.py` 绕过了 `AgentRegistry`，导致 Harness 安全边界、工具注入、内存系统全部失效。如果没有 `/audit` 的独立会话机制，这个 Bug 可能永远不会被发现，因为开发者本人写了代码，也写了测试，确认偏差导致盲区。
+致命 Bug 是在第一次独立审计中发现的——某个执行模块直接实例化组件，绕过了注册中心，导致安全边界、工具注入、内存系统全部失效。如果没有 `/audit` 的独立会话机制，这个 Bug 可能永远不会被发现，因为开发者本人写了代码也写了测试，确认偏差导致盲区。
 
 ---
 
@@ -189,9 +189,9 @@ CEO 验收 → 通过 / 打回修复
 
 ## 活体案例
 
-[OPC Agents](https://github.com/yourusername/opc-agents) — 一个用 OPC Workflow 开发的 AI Agent 平台。
+作者正在用 OPC Workflow 开发一个本地 AI 工程项目，每完成一个 Sprint，README 中的实战数据实时更新。
 
-每完成一个 Sprint，数据实时更新。
+这是方法论有效性的持续验证——不是 Demo，是真实的开发过程。
 
 ---
 
