@@ -168,14 +168,24 @@ The AI will (as an independent reviewer with zero trust in the previous session)
 3. Check logic integrity against your design docs
 4. Produce `docs/sprints/audit-sprint-N.md` with evidence (file paths + line numbers)
 
-**Read the audit report. Decide: pass or send back for fixes.**
+**Read the audit report.**
+
+- ✅ **Pass** → move on to planning the next Sprint (Step 1)
+- ❌ **Fail** → open a new `/sprint` session to fix the issues, then run `/audit` again
+
+The fix loop:
+```
+/sprint (fix session) → close → /audit → fail again? → /sprint (fix) → /audit → ... → pass
+```
+
+Repeat until the audit passes. Only then plan the next Sprint.
 
 ---
 
 ### Step 4 — Repeat
 
-Start the next Sprint with `/plan_sprint` in a new session.
-The audit findings automatically feed into the next Sprint's fix list.
+Once the audit passes, start the next Sprint with `/plan_sprint` in a new session.
+The closed audit findings carry forward automatically as resolved context.
 
 ---
 
