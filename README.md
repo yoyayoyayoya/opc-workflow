@@ -10,7 +10,7 @@
 [![Works with Claude](https://img.shields.io/badge/Works%20with-Claude-orange)](https://claude.ai)
 [![Works with Cursor](https://img.shields.io/badge/Works%20with-Cursor-blue)](https://cursor.sh)
 [![Works with Kiro](https://img.shields.io/badge/Works%20with-Kiro-green)](https://kiro.dev)
-[![Works with Gemini](https://img.shields.io/badge/Works%20with-Gemini-purple)](https://gemini.google.com)
+[![Works with Antigravity](https://img.shields.io/badge/Works%20with-Antigravity-purple)](https://deepmind.google)
 
 </div>
 

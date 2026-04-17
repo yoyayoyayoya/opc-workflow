@@ -25,8 +25,13 @@ cp plan_sprint.md sprint.md audit.md .agents/workflows/
 ### Kiro
 将文件放入 `.kiro/steering/`，Kiro 会自动加载。
 
-### Gemini (Antigravity)
-将文件内容添加到 user rules，或在对话中 `@file` 引用。
+### Antigravity（Google Deepmind）
+与 Claude Code 相同，将文件放入 `.agents/workflows/`：
+```bash
+mkdir -p .agents/workflows
+cp plan_sprint.md sprint.md audit.md .agents/workflows/
+```
+在对话中输入 `/plan_sprint`、`/sprint` 或 `/audit` 触发。
 
 ---
 
