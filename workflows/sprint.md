@@ -20,15 +20,6 @@ description: Sprint 开发工作流 — 小步可控的迭代开发，每个 Spr
 
 ---
 
-> [!IMPORTANT]
-> **⚙️ 测试命令配置（每个项目在 `docs/sprint_tracker.md` 中定义一次）**
-> 在你的项目文档中声明：
-> - `{test_command}`：运行全量测试套件的命令（如 `pytest tests/`、`npm test`、`cargo test` 等）
-> - `{lint_command}`：运行代码检查的命令（如 `ruff check src/`、`eslint src/`、`clippy` 等）
-> 本 workflow 中所有测试步骤均使用这两个占位符，执行时替换为你项目实际命令。
-
----
-
 ## Step 1: 加载上下文（自动执行）
 
 // turbo
@@ -180,11 +171,8 @@ description: Sprint 开发工作流 — 小步可控的迭代开发，每个 Spr
 ### 2.1 确认基线
 
 // turbo
-运行现有测试套件确认基线是绿的：
 
-```bash
-{test_command}
-```
+根据 Sprint 任务涉及的文件和技术栈，推断并运行项目的全量测试套件（检查 `pyproject.toml` / `package.json` / `Cargo.toml` / `Makefile` 等确认正确命令）。确认基线是绿的。
 
 如果基线不绿，必须先修复，不能在红色基线上写新代码。
 
@@ -212,12 +200,7 @@ description: Sprint 开发工作流 — 小步可控的迭代开发，每个 Spr
 
 // turbo
 
-```bash
-{test_command}
-{lint_command}
-```
-
-向用户展示测试结果。**暂停，等用户确认本 Task 通过。**
+根据 Sprint 任务的技术栈，运行全量测试和代码检查，向用户展示结果。**暂停，等用户确认本 Task 通过。**
 
 ### 2.5 更新进度
 
@@ -269,8 +252,8 @@ description: Sprint 开发工作流 — 小步可控的迭代开发，每个 Spr
 
 ## 验证结果
 
-测试（{test_command}）: {通过}/{总数} pass
-Lint（{lint_command}）: {错误数} errors
+测试: {通过}/{总数} pass
+Lint: {错误数} errors
 
 ## 遗留问题
 
