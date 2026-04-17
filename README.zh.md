@@ -77,9 +77,17 @@ workflows/
 
 ## 快速开始
 
+**macOS / Linux**
 ```bash
 bash <(curl -sSL https://raw.githubusercontent.com/yoyayoyayoya/opc-workflow/main/install.sh)
 ```
+
+**Windows（PowerShell）**
+```powershell
+iex (iwr -useb 'https://raw.githubusercontent.com/yoyayoyayoya/opc-workflow/main/install.ps1').Content
+```
+
+> WSL / Git Bash 用户可以直接使用上面的 bash 命令。
 
 脚本会：
 1. 询问你的项目目录路径

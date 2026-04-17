@@ -77,9 +77,17 @@ The critical bug was found during the first independent audit — an execution m
 
 ## Quick Start
 
+**macOS / Linux**
 ```bash
 bash <(curl -sSL https://raw.githubusercontent.com/yoyayoyayoya/opc-workflow/main/install.sh)
 ```
+
+**Windows (PowerShell)**
+```powershell
+iex (iwr -useb 'https://raw.githubusercontent.com/yoyayoyayoya/opc-workflow/main/install.ps1').Content
+```
+
+> WSL / Git Bash users on Windows can use the bash command instead.
 
 The script will:
 1. Ask for your project directory path
